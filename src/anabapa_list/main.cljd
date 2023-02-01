@@ -1,8 +1,10 @@
 (ns anabapa-list.main
   (:require
    ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]
    [cljd.flutter.alpha2 :as f]))
 
+;; (.vibrate m/HapticFeedback)
 (defn main []
   (m/runApp
    (m/MaterialApp
@@ -12,7 +14,7 @@
     .home
     (m/Scaffold
      .appBar (m/AppBar
-              .title (m/Text "Scrollable Positioned List Example"))
+              .title (m/Text "Mongolian Scrollable Positioned List"))
      .body
      (m/Center
       .child (m/Text "Text Text"

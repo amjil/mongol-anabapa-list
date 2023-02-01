@@ -1,0 +1,9 @@
+(ns anabapa-list.indexed-list
+  (:require
+   ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]
+   [cljd.flutter.alpha2 :as f]))
+
+(defn indexed-list []
+  (f/widget 
+   (m/Container)))

@@ -1,0 +1,5 @@
+(ns anabapa-list.data)
+
+(def names 
+  ["ᠠᠯᠲᠠ"
+   ""])

@@ -1,0 +1,86 @@
+(ns anabapa-list.index-bar
+  (:require
+   ["package:flutter/material.dart" :as m]
+   ["package:flutter/rendering.dart" :as render]
+   ["package:mongol/mongol.dart" :as mgl]
+   [cljd.flutter.alpha2 :as f]))
+
+
+;; (def index-bar-items
+;;   [
+;;    "ᠠ"
+;;    "ᠡ"
+;;    "ᠢ"
+;;    "ᠣ"
+;;    "ᠤ᠊"
+;;    "ᠥ"
+;;    "ᠦ᠊"
+;;    "ᠨ᠊"
+;;    "ᠪ᠊"
+;;    "ᠫ᠊"
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    ""
+;;    "#"])
+
+(def index-bar-data
+  ["A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S"
+   "T" "U" "V" "W" "X" "Y" "Z" "#"])
+
+(def index-bar-width 30)
+(def index-bar-item-height 16)
+
+;; (defn ^render/RenderBox get-render-box [ctx]
+;;   (let [^render/RenderBox render-object (.findRenderObject ctx)]
+;;     (if (nil? render-object)
+;;       nil
+;;       render-object)))
+
+(defn index-bar-content []
+  (.generate
+   List
+   (count index-bar-data)
+   (fn [i]
+     (m/SizedBox
+      .width index-bar-width
+      .height index-bar-item-height
+      .child
+      (m/Center
+       .child
+       (m/Text
+        (nth index-bar-data i)
+        .style (m/TextStyle .fontSize 12 .color (m/Color 0xFF666666))))))))
+
+(defn index-bar []
+  (f/widget
+   :context ctx
+   (m/Container .alignment (.center m/Alignment))
+   .child
+   (m/GestureDetector
+    .onVerticalDragDown
+    (fn [^m/DragDownDetails details])
+    .onVerticalDragUpdate
+    (fn [^m/DragUpdateDetails details]
+      nil)
+    .onVerticalDragEnd
+    (fn [^m/DragEndDetails details]
+      nil)
+    .onVerticalDragCancel
+    (fn [] nil)
+    .onTapUp
+    (fn [^m/TapUpDetails details] nil)
+    .behavior (.translucent m/HitTestBehavior))
+   .child
+   (m/Column
+    .mainAxisSize (.min m/MainAxisSize)
+    .children
+    (index-bar-content))))
