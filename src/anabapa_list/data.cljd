@@ -527,5 +527,4 @@
        (map (fn [[k v]] (map-indexed (fn [idx itm] {:name itm :idx idx :tag (str (first itm))}) v)))
        (flatten)
        (sort-by (juxt :tag :name))
-       (map-indexed (fn [idx itm] (assoc itm :index idx)))
-       ))
+       (map-indexed (fn [idx itm] (assoc itm :index idx)))))

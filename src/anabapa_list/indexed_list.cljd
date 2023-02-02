@@ -11,21 +11,21 @@
   (let [item (nth items i)
         sus-height 40]
     (if (= 0 (:idx item))
-      (m/Column
+      (m/Row
        .mainAxisSize (.min m/MainAxisSize)
        .children
        [(m/Container
-         .height sus-height
-         .width (-> m/MediaQuery (.of ctx) .-size .-width)
-         .padding (.only m/EdgeInsets .left 16)
+         .width sus-height
+         .height (-> m/MediaQuery (.of ctx) .-size .-height)
+         .padding (.only m/EdgeInsets .top 16)
          .color (m/Color 0xFFF3F4F5)
-         .alignment (.centerLeft m/Alignment)
+         .alignment (.topCenter m/Alignment)
          .child (m/Text (:tag item)
                         .softWrap false
                         .style (m/TextStyle .fontSize 14
                                             .color (m/Color 0xFF666666))))
-        (m/ListTile .title (m/Text (:name item)))])
-      (m/ListTile .title (m/Text (:name item))))))
+        (mgl/MongolListTile .title (mgl/MongolText (:name item)))])
+      (mgl/MongolListTile .title (mgl/MongolText (:name item))))))
 
 (defn positions-changed
   [^scroll-list/ItemPositionsListener 
@@ -72,12 +72,13 @@
               :items items
               :state state}
        (m/Container
-        .width (-> m/MediaQuery (.of ctx) .-size .-width))
+        .height (-> m/MediaQuery (.of ctx) .-size .-height))
        .child
        (m/Stack
         .children
         [(.builder
           scroll-list/ScrollablePositionedList
+          .scrollDirection (.horizontal m/Axis)
           .itemCount (count items)
           .itemBuilder
           (fn [context index]
