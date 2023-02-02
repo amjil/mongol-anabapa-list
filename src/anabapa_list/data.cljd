@@ -522,6 +522,7 @@
 (defn convert-list []
   (->> items
        (map first)
+       (sort)
        (group-by #(str (first %)))
        (map (fn [[k v]] (map-indexed (fn [idx itm] {:name itm :idx idx :tag (str (first itm))}) v)))
        (flatten)

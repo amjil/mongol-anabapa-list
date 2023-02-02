@@ -63,21 +63,24 @@
 (defn index-bar []
   (f/widget
    :context ctx
-   (m/Container .alignment (.center m/Alignment))
-   .child
+  ;;  (m/Container .alignment (.centerRight m/Alignment))
+  ;;  .child
    (m/GestureDetector
     .onVerticalDragDown
-    (fn [^m/DragDownDetails details])
+    (fn [^m/DragDownDetails details]
+      (dart:core/print "on vertical drag down"))
     .onVerticalDragUpdate
     (fn [^m/DragUpdateDetails details]
-      nil)
+      (dart:core/print ".onVerticalDragUpdate"))
     .onVerticalDragEnd
     (fn [^m/DragEndDetails details]
-      nil)
+      (dart:core/print ".onVerticalDragEnd"))
     .onVerticalDragCancel
-    (fn [] nil)
+    (fn [] 
+      (dart:core/print ".onVerticalDragCancel"))
     .onTapUp
-    (fn [^m/TapUpDetails details] nil)
+    (fn [^m/TapUpDetails details] 
+      (dart:core/print ".onTapUp"))
     .behavior (.translucent m/HitTestBehavior))
    .child
    (m/Column

@@ -10,8 +10,7 @@
 (defn item-builder [items ctx i]
   (let [item (nth items i)
         sus-height 40]
-    (if true;(zero? (:idx item))
-      (m/ListTile .title (m/Text (:name item)))
+    (if (= 0 (:idx item))
       (m/Column
        .mainAxisSize (.min m/MainAxisSize)
        .children
@@ -25,7 +24,8 @@
                         .softWrap false
                         .style (m/TextStyle .fontSize 14
                                             .color (m/Color 0xFF666666))))
-        (m/ListTile .title (m/Text (:name item)))]))))
+        (m/ListTile .title (m/Text (:name item)))])
+      (m/ListTile .title (m/Text (:name item))))))
 
 (defn indexed-list []
   (let [items (sample-data/convert-list)]
@@ -33,9 +33,12 @@
     (if (empty? items)
       (m/Container)
       (f/widget
+       :context ctx
        :let [item-scroll-controller (scroll-list/ItemScrollController)
-             item-position-listener (.create scroll-list/ItemPositionsListener)]
-       
+             item-position-listener (.create scroll-list/ItemPositionsListener)] 
+       (m/Container
+        .width (-> m/MediaQuery (.of ctx) .-size .-width))
+       .child
        (m/Stack
         .children
         [(.builder
