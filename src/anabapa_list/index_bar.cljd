@@ -2,6 +2,7 @@
   (:require
    ["package:flutter/material.dart" :as m]
    ["package:flutter/rendering.dart" :as render]
+   ["package:flutter/services.dart" :as services]
    ["package:mongol/mongol.dart" :as mgl]
    [cljd.flutter.alpha2 :as f]))
 
@@ -39,51 +40,95 @@
 (def index-bar-width 30)
 (def index-bar-item-height 16)
 
-;; (defn ^render/RenderBox get-render-box [ctx]
-;;   (let [^render/RenderBox render-object (.findRenderObject ctx)]
-;;     (if (nil? render-object)
-;;       nil
-;;       render-object)))
-
 (defn index-bar-content []
-  (.generate
-   List
-   (count index-bar-data)
-   (fn [i]
-     (m/SizedBox
-      .width index-bar-width
-      .height index-bar-item-height
-      .child
-      (m/Center
-       .child
-       (m/Text
-        (nth index-bar-data i)
-        .style (m/TextStyle .fontSize 12 .color (m/Color 0xFF666666))))))))
+  (f/widget
+   :get [:state]
+   :let [selected-decoration (m/BoxDecoration .shape (.circle m/BoxShape) .color (.blueAccent m/Colors))
+         selected-style (m/TextStyle .fontSize 12 .color (.white m/Colors))
+         style (m/TextStyle .fontSize 12 .color (m/Color 0xFF666666))]
+   :watch [{:keys [tag]} state]
+   (m/Column
+    .mainAxisSize (.min m/MainAxisSize)
+    .children
+    (.generate
+     List
+     (count index-bar-data)
+     (fn [i]
+       (m/SizedBox
+        .width index-bar-width
+        .height index-bar-item-height
+        .child
+        ;; (m/Center
+        ;;  .child
+        ;;  (m/Text
+        ;;   (nth index-bar-data i)
+        ;;   .style (m/TextStyle .fontSize 12 .color (m/Color 0xFF666666))))
+        (m/Container
+         .alignment (.center m/Alignment)
+         .decoration (if (= tag (nth index-bar-data i)) selected-decoration)
+         .child (m/Text
+                 (nth index-bar-data i)
+                 .style (if (= tag (nth index-bar-data i))
+                          selected-style
+                          style)))))))))
+
+(declare drag-down-position
+         drag-update-position
+         trigger-event)
 
 (defn index-bar []
   (f/widget
    :context ctx
+   :get [:item-num :item-position-listner 
+         :state :item-scroll-controller
+         :items]
   ;;  (m/Container .alignment (.centerRight m/Alignment))
   ;;  .child
    (m/GestureDetector
     .onVerticalDragDown
     (fn [^m/DragDownDetails details]
-      (dart:core/print "on vertical drag down"))
+      ;; (dart:core/print "on vertical drag down")
+      (let [i (drag-down-position details)]
+        (trigger-event :action-down i item-scroll-controller items)))
+
     .onVerticalDragUpdate
     (fn [^m/DragUpdateDetails details]
-      (dart:core/print ".onVerticalDragUpdate"))
+      ;; (dart:core/print ".onVerticalDragUpdate")
+      (let [i (drag-update-position details)]
+        (trigger-event :action-update i item-scroll-controller items)))
+
     .onVerticalDragEnd
     (fn [^m/DragEndDetails details]
       (dart:core/print ".onVerticalDragEnd"))
     .onVerticalDragCancel
-    (fn [] 
+    (fn []
       (dart:core/print ".onVerticalDragCancel"))
-    .onTapUp
-    (fn [^m/TapUpDetails details] 
-      (dart:core/print ".onTapUp"))
+    ;; .onTapUp
+    ;; (fn [^m/TapUpDetails details] 
+    ;;   (dart:core/print ".onTapUp"))
     .behavior (.translucent m/HitTestBehavior))
-   .child
-   (m/Column
-    .mainAxisSize (.min m/MainAxisSize)
-    .children
-    (index-bar-content))))
+   .child (index-bar-content)))
+
+(defn get-scroll-index-by-tag [tag items]
+  (->> items 
+       (filter #(and (zero? (:idx %))
+                     (= tag (:tag %))))
+       last
+       :index))
+
+(defn trigger-event [type bar-index scroll-controller items]
+  ;; (if (some #{type} [:action-down :action-update])
+  ;;   (.vibrate services/HapticFeedback))
+  (let [tag (nth index-bar-data bar-index)
+        i (get-scroll-index-by-tag tag items)]
+    ;; (dart:core/print (str "tag = " tag))
+    ;; (dart:core/print (str "index = " i))
+    (.jumpTo scroll-controller .index (int i))))
+
+(defn drag-down-position [^m/DragDownDetails details]
+  (let [widget-index (quot (-> details .-localPosition .-dy) 16)]
+    (min widget-index (dec (count index-bar-data)))))
+
+(defn drag-update-position [^m/DragUpdateDetails details]
+  (let [widget-index (quot (-> details .-localPosition .-dy) 16)]
+    (min widget-index (dec (count index-bar-data)))))

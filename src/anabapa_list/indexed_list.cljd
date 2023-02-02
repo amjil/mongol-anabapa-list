@@ -1,7 +1,7 @@
 (ns anabapa-list.indexed-list
   (:require
    ["package:flutter/material.dart" :as m]
-   ["package:scrollable_positioned_list/scrollable_positioned_list.dart" :as scroll-list]
+   ["package:scrollable_positioned_list/scrollable_positioned_list.dart" :as scroll-list :refer [ItemPosition]]
    ["package:mongol/mongol.dart" :as mgl]
    [anabapa-list.index-bar :as index-bar]
    [anabapa-list.data :as sample-data]
@@ -27,6 +27,31 @@
         (m/ListTile .title (m/Text (:name item)))])
       (m/ListTile .title (m/Text (:name item))))))
 
+(defn positions-changed
+  [^scroll-list/ItemPositionsListener 
+   item-position-listner 
+   state
+   items]
+  (let [^Iterable
+        positions
+        (-> item-position-listner
+            .-itemPositions
+            .-value)]
+    (when (.-isNotEmpty positions)
+      (let [^ItemPosition item-position
+            (-> positions
+                (.where (fn [^ItemPosition position] (> (.-itemTrailingEdge position) 0)))
+                (.reduce
+                 (fn [^ItemPosition min ^ItemPosition position]
+                   (if (< (.-itemTrailingEdge position) (.-itemTrailingEdge min))
+                     position
+                     min))))
+            i (.-index item-position)
+            tag-temp (-> items (nth i) :tag)]
+        (when (not= (:tag @state) tag-temp)
+          (dart:core/print tag-temp)
+          (swap! state assoc :tag tag-temp))))))
+
 (defn indexed-list []
   (let [items (sample-data/convert-list)]
     ;; (dart:core/print (str "aaaaa" (count items)))
@@ -35,7 +60,17 @@
       (f/widget
        :context ctx
        :let [item-scroll-controller (scroll-list/ItemScrollController)
-             item-position-listener (.create scroll-list/ItemPositionsListener)] 
+             item-position-listener (.create scroll-list/ItemPositionsListener)
+             state (atom {:tag "A"})
+             _ (-> item-position-listener
+                   .-itemPositions
+                   (.addListener 
+                    #(positions-changed item-position-listener state items)))] 
+       :bind {:item-num (count items)
+              :item-scroll-controller item-scroll-controller
+              :item-position-listener item-position-listener
+              :items items
+              :state state}
        (m/Container
         .width (-> m/MediaQuery (.of ctx) .-size .-width))
        .child

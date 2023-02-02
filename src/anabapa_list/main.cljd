@@ -5,7 +5,6 @@
    [cljd.flutter.alpha2 :as f]
    [anabapa-list.indexed-list :as indexed-list]))
 
-;; (.vibrate m/HapticFeedback)
 (defn main []
   (m/runApp
    (m/MaterialApp
