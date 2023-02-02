@@ -1,9 +1,51 @@
 (ns anabapa-list.indexed-list
   (:require
    ["package:flutter/material.dart" :as m]
+   ["package:scrollable_positioned_list/scrollable_positioned_list.dart" :as scroll-list]
    ["package:mongol/mongol.dart" :as mgl]
+   [anabapa-list.index-bar :as index-bar]
+   [anabapa-list.data :as sample-data]
    [cljd.flutter.alpha2 :as f]))
 
+(defn item-builder [items ctx i]
+  (let [item (nth items i)
+        sus-height 40]
+    (if true;(zero? (:idx item))
+      (m/ListTile .title (m/Text (:name item)))
+      (m/Column
+       .mainAxisSize (.min m/MainAxisSize)
+       .children
+       [(m/Container
+         .height sus-height
+         .width (-> m/MediaQuery (.of ctx) .-size .-width)
+         .padding (.only m/EdgeInsets .left 16)
+         .color (m/Color 0xFFF3F4F5)
+         .alignment (.centerLeft m/Alignment)
+         .child (m/Text (:tag item)
+                        .softWrap false
+                        .style (m/TextStyle .fontSize 14
+                                            .color (m/Color 0xFF666666))))
+        (m/ListTile .title (m/Text (:name item)))]))))
+
 (defn indexed-list []
-  (f/widget 
-   (m/Container)))
+  (let [items (sample-data/convert-list)]
+    ;; (dart:core/print (str "aaaaa" (count items)))
+    (if (empty? items)
+      (m/Container)
+      (f/widget
+       :let [item-scroll-controller (scroll-list/ItemScrollController)
+             item-position-listener (.create scroll-list/ItemPositionsListener)]
+       
+       (m/Stack
+        .children
+        [(.builder
+          scroll-list/ScrollablePositionedList
+          .itemCount (count items)
+          .itemBuilder
+          (fn [context index]
+            (item-builder items context index))
+          .itemScrollController item-scroll-controller
+          .itemPositionsListener item-position-listener)
+         (m/Align
+          .alignment (.centerRight m/Alignment)
+          .child (index-bar/index-bar))])))))

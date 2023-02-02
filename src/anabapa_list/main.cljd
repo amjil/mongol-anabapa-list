@@ -2,7 +2,8 @@
   (:require
    ["package:flutter/material.dart" :as m]
    ["package:mongol/mongol.dart" :as mgl]
-   [cljd.flutter.alpha2 :as f]))
+   [cljd.flutter.alpha2 :as f]
+   [anabapa-list.indexed-list :as indexed-list]))
 
 ;; (.vibrate m/HapticFeedback)
 (defn main []
@@ -16,9 +17,10 @@
      .appBar (m/AppBar
               .title (m/Text "Mongolian Scrollable Positioned List"))
      .body
-     (m/Center
-      .child (m/Text "Text Text"
-                     .style (m/TextStyle
-                             .color m.Colors/blue
-                             .fontSize 32.0))))
+     (indexed-list/indexed-list))
+    ;;  (m/Center
+    ;;   .child (m/Text "Text Text"
+    ;;                  .style (m/TextStyle
+    ;;                          .color m.Colors/blue
+    ;;                          .fontSize 32.0))))
     .debugShowCheckedModeBanner false)))
